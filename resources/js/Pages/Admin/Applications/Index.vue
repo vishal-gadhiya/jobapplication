@@ -4,6 +4,14 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Applications
             </h2>
+            <div class="float-right">
+                <el-breadcrumb separator="/">
+                    <el-breadcrumb-item>
+                        <inertia-link class="text-decoration-none" :href="route('admin.dashboard')">Home</inertia-link>
+                    </el-breadcrumb-item>
+                    <el-breadcrumb-item>Applications</el-breadcrumb-item>
+                </el-breadcrumb>
+            </div>
         </template>
 
         <div class="py-12">

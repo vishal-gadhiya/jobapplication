@@ -15,13 +15,13 @@
 
                             <!-- Navigation Links -->
                             <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <breeze-nav-link :href="route('admin.dashboard')" :active="route().current('admin.dashboard')">
+                                <breeze-nav-link class="text-decoration-none" :href="route('admin.dashboard')" :active="route().current('admin.dashboard')">
                                     Dashboard
                                 </breeze-nav-link>
                             </div>
 
                             <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                                <breeze-nav-link :href="route('admin.applications.index')" :active="route().current('admin.applications.index')">
+                                <breeze-nav-link class="text-decoration-none" :href="route('admin.applications.index')" :active="route().current('admin.applications.index') || route().current('admin.applications.edit')">
                                     Applications
                                 </breeze-nav-link>
                             </div>
@@ -30,7 +30,8 @@
                         <div class="hidden sm:flex sm:items-center sm:ml-6">
                             <!-- Settings Dropdown -->
                             <div class="ml-3 relative">
-                                <breeze-dropdown align="right" width="48">
+                                <inertia-link class="el-button el-button--success is-round text-decoration-none" :href="route('admin.logout')" method="post">Log Out</inertia-link>
+                                <!-- <breeze-dropdown align="right" width="48">
                                     <template #trigger>
                                         <span class="inline-flex rounded-md">
                                             <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
@@ -44,11 +45,12 @@
                                     </template>
 
                                     <template #content>
+
                                         <breeze-dropdown-link :href="route('admin.logout')" method="post" as="button">
                                             Log Out
                                         </breeze-dropdown-link>
                                     </template>
-                                </breeze-dropdown>
+                                </breeze-dropdown> -->
                             </div>
                         </div>
 

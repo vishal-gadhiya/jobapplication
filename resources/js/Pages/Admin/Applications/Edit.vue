@@ -1,9 +1,20 @@
 <template>
     <breeze-authenticated-layout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight text-center">
-               Edit Application
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                Edit Application
             </h2>
+            <div class="float-right">
+                <el-breadcrumb separator="/">
+                    <el-breadcrumb-item>
+                        <inertia-link class="text-decoration-none" :href="route('admin.dashboard')">Home</inertia-link>
+                    </el-breadcrumb-item>
+                    <el-breadcrumb-item>
+                        <inertia-link class="text-decoration-none" :href="route('admin.applications.index')">Applications</inertia-link>
+                    </el-breadcrumb-item>
+                    <el-breadcrumb-item>Edit</el-breadcrumb-item>
+                </el-breadcrumb>
+            </div>
         </template>
 
         <div class="py-8">
@@ -79,10 +90,10 @@
 
                                 <h1>Work Experience</h1>
 
-                                <div class="border" v-for="(experience, index) in form.work_experience">
-                                    <div class="col-12 p-1 pb-5">
+                                <div class="border pt-3" v-for="(experience, index) in form.work_experience">
+                                    <!-- <div class="col-12 p-1 pb-5">
                                         <el-button @click="deleteItem(index)" class="float-right" type="danger" icon="el-icon-delete" circle></el-button>
-                                    </div>
+                                    </div> -->
                                     <div class="row">
                                         <el-form-item label="Company" class="col-md-6"
                                             :prop="'work_experience.' + index + '.company'"
@@ -102,7 +113,8 @@
                                             <el-date-picker
                                                 v-model="experience.fromDate"
                                                 type="date"
-                                                placeholder="Select Date">
+                                                placeholder="Select Date"
+                                                @change="fromDateChangedHandler(experience)">
                                             </el-date-picker>
                                         </el-form-item>
                                         <el-form-item label="To Date" class="col-md-6"
@@ -111,16 +123,17 @@
                                             <el-date-picker
                                                 v-model="experience.toDate"
                                                 type="date"
-                                                placeholder="Select Date">
+                                                placeholder="Select Date"
+                                                @change="toDateChangedHandler(experience)">
                                             </el-date-picker>
                                         </el-form-item>
                                     </div>
                                 </div>
-                                <div class="row pt-3">
+                                <!-- <div class="row pt-3">
                                     <el-form-item class="col-md-3">
                                         <el-button type="success" @click="addItem">{{ form.work_experience.length > 0 ? 'Add More' : 'Add Experience' }}</el-button>
                                     </el-form-item>
-                                </div>
+                                </div> -->
                                 <el-divider></el-divider>
 
                                 <h1>Known Languages</h1>
@@ -175,7 +188,7 @@
 
                                 <el-form-item>
                                     <el-button type="primary" @click="submitForm('form')">Save</el-button>
-                                    <el-button @click="resetForm('form')">Reset</el-button>
+                                    <inertia-link class="el-button text-decoration-none" :href="route('admin.applications.index')">Cancel</inertia-link>
                                 </el-form-item>
                             </el-form>
                         </div>
@@ -189,11 +202,16 @@
 
 <script>
 
-import BreezeAuthenticatedLayout from '@/Layouts/User/App';
+import BreezeAuthenticatedLayout from '@/Layouts/Admin/Authenticated'
 
 const beginner = 1;
 const mediator = 2;
-const expert = 3;
+const expert   = 3;
+
+const is_checked = 1;
+const read = 1;
+const write = 2;
+const speak = 3;
 
 export default {
     props: ['user', 'educations', 'locations'],
@@ -217,18 +235,11 @@ export default {
                     id: this.user.education.id,
                     qualification: this.user.education.education_id,
                     board_university: this.user.education.name,
-                    year: this.user.education.year,
+                    year: dayjs().year(this.user.education.year),
                     percentage: this.user.education.percentage,
                 },
 
-                work_experience: [
-                    /*{
-                        company: '',
-                        designation: '',
-                        fromDate: '',
-                        toDate: '',
-                    },*/
-                ],
+                work_experience: [],
                 
                 languages: [],
 
@@ -306,34 +317,70 @@ export default {
         init() {
             this.loadData();
         },
+        skillType(skill) {
+            if (skill.is_beginer === 1) { return beginner; }
+
+            if (skill.is_mediator === 1) { return mediator; }
+
+            if (skill.is_expert === 1) { return expert; }
+
+            return null;
+
+        },
         loadData() {
-            /*this.user.skills.map((skill) => { 
+            this.user.experiences.map((experience) => { 
+                this.form.work_experience.push({
+                    id: experience.id,
+                    company: experience.company_name,
+                    designation: experience.designation,
+                    fromDate: dayjs(experience.from).format('YYYY-MM-DD'),
+                    toDate: dayjs(experience.to).format('YYYY-MM-DD'),
+                });
+            });
+            
+            this.user.skills.map((skill) => { 
                 this.form.skills.push({
                     'id': skill.id,
-                    'name': skill.name,
-                    'is_checked': skill.is_checked,
-                    'type': '',
-                    'is_disabled': true
+                    'name': skill.skill.name,
+                    'is_checked': skill.is_checked === is_checked,
+                    'type': this.skillType(skill),
+                    'is_disabled': skill.is_checked !== is_checked
                 });
-            });*/
+            });
 
             this.user.languages.map((language) => { 
                 this.form.languages.push({
                     'id': language.id,
-                    'name': language.name,
-                    'is_checked': language.is_checked,
-                    'read': language.is_read,
-                    'write': language.is_write,
-                    'speak': language.is_speak,
-                    'is_disabled': !language.is_checked
+                    'name': language.language.name,
+                    'is_checked': language.is_checked === is_checked,
+                    'read': language.is_read === read,
+                    'write': language.is_write === write,
+                    'speak': language.is_speak === speak,
+                    'is_disabled': language.is_checked !== is_checked
                 });
             });
         },
         submitForm(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
-                    this.$inertia.post(this.route('admin.applications.store'), this.form).then( () => {
-                        this.resetForm('form');
+                    this.form.education_details.year = dayjs(this.form.education_details.year).format('YYYY');
+                    this.$inertia.post(this.route('admin.applications.store'), this.form)
+                    .then( () => {
+                        if (this.$page.props.flash.success) {
+                            this.$notify({
+                                title: 'Success',
+                                message: this.$page.props.flash.success,
+                                type: 'success'
+                            });
+                        }
+                        
+                        if (this.$page.props.flash.error) {
+                            this.$notify({
+                                title: 'Error',
+                                message: this.$page.props.flash.error,
+                                type: 'error'
+                            });
+                        }
                     });
                 } else {
                     return false;
@@ -343,7 +390,7 @@ export default {
         resetForm(formName) {
             this.$refs[formName].resetFields();
         },
-        addItem () {
+        /*addItem () {
             this.form.work_experience.push({
                 company: '',
                 designation: '',
@@ -353,7 +400,7 @@ export default {
         },
         deleteItem (index) {
             this.form.work_experience.splice(index, 1)
-        },
+        },*/
         languageChangeHandler (language) {
             language.read = false;
             language.write = false;
@@ -371,6 +418,12 @@ export default {
             } else {
                 skill.is_disabled = true;
             }
+        },
+        fromDateChangedHandler (experience) {
+            experience.fromDate = dayjs(experience.fromDate).format('YYYY-MM-DD');
+        },
+        toDateChangedHandler (experience) {
+            experience.toDate = dayjs(experience.toDate).format('YYYY-MM-DD');
         }
     }
 }

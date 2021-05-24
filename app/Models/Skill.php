@@ -11,7 +11,4 @@ class Skill extends Model
 
     protected $guarded = [];
 
-    const TYPE_BEGINER = 1;
-    const TYPE_MEDIATOR = 2;
-    const TYPE_EXPERT = 3;
 }

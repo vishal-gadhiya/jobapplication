@@ -8,13 +8,10 @@ use Inertia\Inertia;
 use App\Models\User;
 use App\Models\Education;
 use App\Models\Language;
+use App\Models\UserLanguage;
+use App\Models\UserSkill;
 use App\Models\Skill;
 use App\Models\City;
-use App\Models\UserEducation;
-use App\Models\UserSkill;
-use App\Models\UserLanguage;
-use App\Models\UserExperience;
-use App\Models\UserPreference;
 use Carbon\Carbon;
 use Exception;
 
@@ -57,66 +54,66 @@ class ApplicationController extends Controller
 
 	    	if (!empty($user)) {
 
-	    		$user->education()->save(new UserEducation([
+	    		$user->education()->create([
 	    			'education_id' => (int) $education['qualification'],
 	    			'name'		   => $education['board_university'], 
-	    			'year'		   => Carbon::parse($education['year'])->year,
+	    			'year'		   => $education['year'],
 	    			'percentage'   => (float) $education['percentage'], 
-	    		]));
+	    		]);
 
 	    		if (count($experiences) > 0) {
 	    			$exps = array();
 	    			foreach ($experiences as $experience) {
 
-	    				array_push($exps, new UserExperience([
+	    				array_push($exps, [
 	    					'company_name' => $experience['company'],
 	    					'designation'  => $experience['designation'],
-	    					'from'		   => Carbon::parse($experience['fromDate']),
-	    					'to' 		   => Carbon::parse($experience['toDate']),
-	    				]));
+	    					'from'		   => $experience['fromDate'],
+	    					'to' 		   => $experience['toDate'],
+	    				]);
 	    			}
 
-	    			$user->experiences()->saveMany($exps);
+	    			$user->experiences()->createMany($exps);
 	    		}
 
 	    		if (count($languages) > 0) {
 	    			$langs = array();
 	    			foreach ($languages as $lang) {
 	    				
-	    				array_push($langs, new UserLanguage([
+	    				array_push($langs, [
 	    					'language_id' => (int) $lang['id'],
-	    					'is_checked'  => $lang['is_checked'],
-	    					'is_read'	  => $lang['read'],
-	    					'is_write'	  => $lang['write'],
-	    					'is_speak'	  => $lang['speak'],
-	    				]));
+	    					'is_checked'  => (int) $lang['is_checked'] === UserLanguage::IS_CHECKED,
+	    					'is_read'	  => (int) $lang['read'] === UserLanguage::IS_READ,
+	    					'is_write'	  => (int) $lang['write'] === UserLanguage::IS_WRITE,
+	    					'is_speak'	  => (int) $lang['speak'] === UserLanguage::IS_SPEAK,
+	    				]);
 	    			}
 
-	    			$user->languages()->saveMany($langs);
+	    			$user->languages()->createMany($langs);
 	    		}
 
 	    		if (count($skills) > 0) {
 	    			$skls = array();
 	    			foreach ($skills as $skill) {
 	    				
-	    				array_push($skls, new UserSkill([
+	    				array_push($skls, [
 	    					'skill_id' 	  => (int) $skill['id'],
-	    					'is_checked'  => $lang['is_checked'],
-	    					'is_beginer'  => (int) $skill['type'] === Skill::TYPE_BEGINER,
-	    					'is_mediator' => (int) $skill['type'] === Skill::TYPE_MEDIATOR,
-	    					'is_expert'	  => (int) $skill['type'] === Skill::TYPE_EXPERT,
-	    				]));
+	    					'is_checked'  => (int) $skill['is_checked'] === UserSkill::IS_CHECKED,
+	    					'is_beginer'  => (int) $skill['type'] === UserSkill::TYPE_BEGINER,
+	    					'is_mediator' => (int) $skill['type'] === UserSkill::TYPE_MEDIATOR,
+	    					'is_expert'	  => (int) $skill['type'] === UserSkill::TYPE_EXPERT,
+	    				]);
 	    			}
 
-	    			$user->skills()->saveMany($skls);
+	    			$user->skills()->createMany($skls);
 	    		}
 
-	    		$user->preference()->save(new UserPreference([
+	    		$user->preference()->create([
 	    			'city_id' 		=> (int) $preference['location'],
 	    			'expected_ctc'  => (float) $preference['expected_ctc'],
 	    			'current_ctc' 	=> (float) $preference['current_ctc'],
 	    			'notice_period' => $preference['notice_period'],
-	    		]));
+	    		]);
 
 	    		return redirect()->back()->withSuccess('Aplication Submitted Successfully.');
 

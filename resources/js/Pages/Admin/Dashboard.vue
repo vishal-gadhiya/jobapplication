@@ -13,7 +13,7 @@
                         <div>
                             Welcome to Dashboard! 
                             <el-link type="primary">
-                                <inertia-link :href="route('admin.applications.index')">
+                                <inertia-link class="text-decoration-none" :href="route('admin.applications.index')">
                                     Click here to view the applications.
                                 </inertia-link>
                             </el-link>

@@ -102,7 +102,8 @@
                                             <el-date-picker
                                                 v-model="experience.fromDate"
                                                 type="date"
-                                                placeholder="Select Date">
+                                                placeholder="Select Date"
+                                                @change="fromDateChangedHandler(experience)">
                                             </el-date-picker>
                                         </el-form-item>
                                         <el-form-item label="To Date" class="col-md-6"
@@ -111,7 +112,8 @@
                                             <el-date-picker
                                                 v-model="experience.toDate"
                                                 type="date"
-                                                placeholder="Select Date">
+                                                placeholder="Select Date"
+                                                @change="toDateChangedHandler(experience)">
                                             </el-date-picker>
                                         </el-form-item>
                                     </div>
@@ -329,6 +331,7 @@ export default {
         submitForm(formName) {
             this.$refs[formName].validate((valid) => {
                 if (valid) {
+                    this.form.education_details.year = dayjs(this.form.education_details.year).format('YYYY');
                     this.$inertia.post(this.route('user.application.store'), this.form).then( () => {
                         this.resetForm('form');
                     });
@@ -368,6 +371,12 @@ export default {
             } else {
                 skill.is_disabled = true;
             }
+        },
+        fromDateChangedHandler (experience) {
+            experience.fromDate = dayjs(experience.fromDate).format('YYYY-MM-DD');
+        },
+        toDateChangedHandler (experience) {
+            experience.toDate = dayjs(experience.toDate).format('YYYY-MM-DD');
         }
     }
 }
